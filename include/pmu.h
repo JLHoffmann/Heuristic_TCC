@@ -1,0 +1,268 @@
+// EPOS PMU Mediator Common Package
+
+#ifndef __pmu_h
+#define __pmu_h
+
+#include <system/config.h>
+
+__BEGIN_SYS
+
+class PMU_Common
+{
+public:
+    typedef unsigned int Channel;
+    typedef long long int Count;
+
+    enum Event {
+        CLOCK, //0
+        DVS_CLOCK, //1
+        INSTRUCTION, //2
+        BRANCH, //3
+        BRANCH_MISS, //4
+        L1_HIT, //5
+        L2_HIT, //6
+        L3_HIT, //7
+        LLC_HIT = L3_HIT,
+        CACHE_HIT = LLC_HIT,
+        L1_MISS, //8
+        L2_MISS, //9
+        L3_MISS, //10
+        LLC_MISS = L3_MISS,
+        CACHE_MISS = LLC_MISS,
+        LLC_HITM, //11
+        //Sandy_Bridge_events
+        LD_BLOCKS_DATA_UNKNOWN_C, //#12
+        LD_BLOCKS_STORE_FORWARD_C,
+        LD_BLOCKS_NO_SR_C,
+        LD_BLOCKS_ALL_BLOCK_C,
+        MISALIGN_MEM_REF_LOADS_C,
+        MISALIGN_MEM_REF_STORES_C,
+        LD_BLOCKS_PARTIAL_ADDRESS_ALIAS_C,
+        LD_BLOCKS_PARTIAL_ALL_STA_BLCOK_C,
+        DTLB_LOAD_MISSES_MISS_CAUSES_A_WALK_C,
+        DTLB_LOAD_MISSES_MISS_WALK_COMPLETED_C,
+        DTLB_LOAD_MISSES_MISS_WALK_DURATION_C,
+        DTLB_LOAD_MISSES_MISS_STLB_HIT_C,
+        INT_MISC_RECOVERY_CYCLES_C, 
+        INT_MISC_RAT_STALL_CYCLES_C,
+        UOPS_ISSUED_ANY_C, 
+        FP_COMP_OPS_EXE_X87_C,
+        FP_COMP_OPS_EXE_SSE_FP_PACKED_DOUBLE_C,
+        FP_COMP_OPS_EXE_SSE_FP_SCALAR_SINGLE_C,
+        FP_COMP_OPS_EXE_SSE_PACKED_SINGLE_C,
+        FP_COMP_OPS_EXE_SSE_SCALAR_DOUBLE_C,
+        SIMD_FP_256_PACKED_SINGLE_C,
+        SIMD_FP_256_PACKED_DOUBLE_C,
+        ARITH_FPU_DIV_ACTIVE_C,
+        INSTS_WRITTEN_TO_IQ_INSTS_C,
+        L2_RQSTS_DEMAND_DATA_RD_HIT_C,
+        L2_RQSTS_ALL_DEMAND_DATA_RD_C,
+        L2_RQSTS_RFO_HITS_C,
+        L2_RQSTS_RFO_MISS_C,
+        L2_RQSTS_ALL_RFO_C,
+        L2_RQSTS_CODE_RD_HIT_C,
+        L2_RQSTS_CODE_RD_MISS_C,
+        L2_RQSTS_ALL_CODE_RD_C,
+        L2_RQSTS_PF_HIT_C,
+        L2_RQSTS_PF_MISS_C,
+        L2_RQSTS_ALL_PF_C,
+        L2_STORE_LOCK_RQSTS_MISS_C,
+        L2_STORE_LOCK_RQSTS_HIT_E_C,
+        L2_STORE_LOCK_RQSTS_HIT_M_C,
+        L2_STORE_LOCK_RQSTS_ALL_C,
+        L2_L1D_WB_RQSTS_HIT_E_C,
+        L2_L1D_WB_RQSTS_HIT_M_C,
+        LONGEST_LAT_CACHE_REFERENCE_C, //table 19-1 architectural event
+        LONGEST_LAT_CACHE_MISS_C, //table 19-1 architectural event
+        CPU_CLK_UNHALTED_THREAD_P_C, //table 19-1 architectural event
+        CPU_CLK_THREAD_UNHALTED_REF_XCLK_C, //table 1901 architectural event
+        L1D_PEND_MISS_PENDING_C, //counter 2 only - set cmask = 1 to count cycles
+        DTLB_STORE_MISSES_MISS_CAUSES_A_WALK_C,
+        DTLB_STORE_MISSES_WALK_COMPLETED_C,
+        DTLB_STORE_MISSES_WALK_DURATION_C,
+        DTLB_STORE_MISSES_TLB_HIT_C,
+        LOAD_HIT_PRE_SW_PF_C,
+        LOAD_HIT_PREHW_PF_C,
+        HW_PRE_REQ_DL1_MISS_C,
+        L1D_REPLACEMENT_C,
+        L1D_ALLOCATED_IN_M_C,
+        L1D_EVICTION_C,
+        L1D_ALL_M_REPLACEMENT_C,
+        PARTIAL_RAT_STALLS_FLAGS_MERGE_UOP_C,
+        PARTIAL_RAT_STALLS_SLOW_LEA_WINDOW_C,
+        PARTIAL_RAT_STALLS_MUL_SINGLE_UOP_C,
+        RESOURCE_STALLS2_ALL_FL_EMPTY_C,
+        RESOURCE_STALLS2_ALL_PRF_CONTROL_C,
+        RESOURCE_STALLS2_BOB_FULL_C,
+        RESOURCE_STALLS2_OOO_RSRC_C,
+        CPL_CYCLES_RING0_C, //use edge to count transition
+        CPL_CYCLES_RING123_C,
+        RS_EVENTS_EMPTY_CYCLES_C,
+        OFFCORE_REQUESTS_OUTSTANDING_DEMAND_DATA_RD_C,
+        OFFCORE_REQUESTS_OUTSTANDING_DEMAND_RFO_C,
+        OFFCORE_REQUESTS_OUTSTANDING_ALL_DATA_RD_C,
+        LOCK_CYCLES_SPLIT_LOCK_UC_LOCK_DURATION_C,
+        LOCK_CYCLES_CACHE_LOCK_DURATION_C,
+        IDQ_EMPTY_C,
+        IDQ_MITE_UOPS_C,
+        IDQ_DSB_UOPS_C,
+        IDQ_MS_DSB_UOPS_C,
+        IDQ_MS_MITE_UOPS_C,
+        IDQ_MS_UOPS_C,
+        ICACHE_MISSES_C,
+        ITLB_MISSES_MISS_CAUSES_A_WALK_C,
+        ITLB_MISSES_WALK_COMPLETED_C,
+        ITLB_MISSES_WALK_DURATION_C,
+        ITLB_MISSES_STLB_HIT_C,
+        ILD_STALL_LCP_C,
+        ILD_STALL_IQ_FULL_C,
+        BR_INST_EXEC_COND_C,
+        BR_INST_EXEC_DIRECT_JMP_C,
+        BR_INST_EXEC_INDIRECT_JMP_NON_CALL_RET_C,
+        BR_INST_EXEC_RETURN_NEAR_C,
+        BR_INST_EXEC_DIRECT_NEAR_CALL_C,
+        BR_INST_EXEC_INDIRECT_NEAR_CALL_C,
+        BR_INST_EXEC_NON_TAKEN_C,
+        BR_INST_EXEC_TAKEN_C,
+        BR_INST_EXEC_ALL_BRANCHES_C,
+        BR_MISP_EXEC_COND_C,
+        BR_MISP_EXEC_INDIRECT_JMP_NON_CALL_RET_C,
+        BR_MISP_EXEC_RETURN_NEAR_C,
+        BR_MISP_EXEC_DIRECT_NEAR_CALL_C,
+        BR_MISP_EXEC_INDIRECT_NEAR_CALL_C,
+        BR_MISP_EXEC_NON_TAKEN_C,
+        BR_MISP_EXEC_TAKEN_C,
+        BR_MISP_EXEC_ALL_BRANCHES_C,
+        IDQ_UOPS_NOT_DELIVERED_CORE_C,
+        UOPS_DISPATCHED_PORT_PORT_0_C,
+        UOPS_DISPATCHED_PORT_PORT_1_C,
+        UOPS_DISPATCHED_PORT_PORT_2_LD_C,
+        UOPS_DISPATCHED_PORT_PORT_2_STA_C,
+        UOPS_DISPATCHED_PORT_PORT_2_C,
+        UOPS_DISPATCHED_PORT_PORT_3_LD_C,
+        UOPS_DISPATCHED_PORT_PORT_3_STA_C,
+        UOPS_DISPATCHED_PORT_PORT_3_C,
+        UOPS_DISPATCHED_PORT_PORT_4_C,
+        UOPS_DISPATCHED_PORT_PORT_5_C,
+        RESOURCE_STALLS_ANY_C,
+        RESOURCE_STALLS_LB_C,
+        RESOURCE_STALLS_RS_C,
+        RESOURCE_STALLS_SB_C,
+        RESOURCE_STALLS_ROB_C,
+        RESOURCE_STALLS_FCSW_C,
+        RESOURCE_STALLS_MXCSR_C,
+        RESOURCE_STALLS_OTHER_C,
+        DSB2MITE_SWITCHES_COUNT_C,
+        DSB2MITE_SWITCHES_PENALTY_CYCLES_C,
+        DSB_FILL_OTHER_CANCEL_C,
+        DSB_FILL_EXCEED_DSB_LINES_C,
+        DSB_FILL_ALL_CANCEL_C,
+        ITLB_ITLB_FLUSH_C,
+        OFFCORE_REQUESTS_DEMAND_DATA_RD_C,
+        OFFCORE_REQUESTS_DEMAND_RFO_C,
+        OFFCORE_REQUESTS_ALL_DATA_RD_C,
+        UOPS_DISPATCHED_THREAD_C,
+        UOPS_DISPATCHED_CORE_C,
+        OFFCORE_REQUESTS_BUFFER_SQ_FULL_C,
+        AGU_BYPASS_CANCEL_COUNT_C,
+        OFF_CORE_RESPONSE_0_C,
+        OFF_CORE_RESPONSE_1_C,
+        TLB_FLUSH_DTLB_THREAD_C,
+        TLB_FLUSH_STLB_ANY_C,
+        L1D_BLOCKS_BANK_CONFLICT_CYCLES_C,
+        INST_RETIRED_ANY_P_C, //table 19-1 architectural event
+        INST_RETIRED_PREC_DIST_C, //PMC1 only; must quiesce other PMCs
+        OTHER_ASSISTS_ITLB_MISS_RETIRED_C,
+        OTHER_ASSISTS_AVX_STORE_C,
+        OTHER_ASSISTS_AVX_TO_SSE_C,
+        OTHER_ASSISTS_SSE_TO_AVX_C,
+        UOPS_RETIRED_ALL_C,
+        UOPS_RETIRED_RETIRE_SLOTS_C,
+        MACHINE_CLEARS_MEMORY_ORDERING_C,
+        MACHINE_CLEARS_SMC_C,
+        MACHINE_CLEARS_MASKMOV_C,
+        BR_INST_RETIRED_ALL_BRANCHES_ARCH_C, //table 19-1
+        BR_INST_RETIRED_CONDITIONAL_C,
+        BR_INST_RETIRED_NEAR_CALL_C,
+        BR_INST_RETIRED_ALL_BRANCHES_C,
+        BR_INST_RETIRED_NEAR_RETURN_C,
+        BR_INST_RETIRED_NOT_TAKEN_C,
+        BR_INST_RETIRED_NEAR_TAKEN_C,
+        BR_INST_RETIRED_FAR_BRANCH_C,
+        BR_MISP_RETIRED_ALL_BRANCHES_ARCH_C, //table 19-1
+        BR_MISP_RETIRED_CONDITIONAL_C,
+        BR_MISP_RETIRED_NEAR_CALL_C,
+        BR_MISP_RETIRED_ALL_BRANCHES_C,
+        BR_MISP_RETIRED_NOT_TAKEN_C,
+        BR_MISP_RETIRED_TAKEN_C,
+        FP_ASSIST_X87_OUTPUT_C,
+        FP_ASSIST_X87_INPUT_C,
+        FP_ASSIST_SIMD_OUTPUT_C,
+        FP_ASSIST_SIMD_INPUT_C,
+        FP_ASSIST_ANY_C,
+        ROB_MISC_EVENTS_LBR_INSERTS_C,
+        MEM_TRANS_RETIRED_LOAD_LATENCY_C, //specify threshold in MSR 0x3F6
+        MEM_TRANS_RETIRED_PRECISE_STORE_C, //see section 18.8.4.3
+        MEM_UOP_RETIRED_LOADS_C,
+        MEM_UOP_RETIRED_STORES_C,
+        MEM_UOP_RETIRED_STLB_MISS_C,
+        MEM_UOP_RETIRED_LOCK_C,
+        MEM_UOP_RETIRED_SPLIT_C,
+        MEM_UOP_RETIRED_ALL_C,
+        MEM_UOPS_RETIRED_ALL_LOADS_C, // Supports PEBS. PMC0-3 only regardless HTT.
+        MEM_LOAD_UOPS_RETIRED_L1_HIT_C,
+        MEM_LOAD_UOPS_RETIRED_L2_HIT_C,
+        MEM_LOAD_UOPS_RETIRED_L3_HIT_C,
+        MEM_LOAD_UOPS_RETIRED_HIT_LFB_C,
+        XSNP_MISS_C,
+        XSNP_HIT_C,
+        XSNP_HITM_C,
+        XSNP_NONE_C,
+        MEM_LOAD_UOPS_MISC_RETIRED_LLC_MISS_C,
+        L2_TRANS_DEMAND_DATA_RD_C,
+        L2_TRANS_RFO_C,
+        L2_TRANS_CODE_RD_C,
+        L2_TRANS_ALL_PF_C,
+        L2_TRANS_L1D_WB_C,
+        L2_TRANS_L2_FILL_C,
+        L2_TRANS_L2_WB_C,
+        L2_TRANS_ALL_REQ_UESTS_C,
+        L2_LINES_IN_I_C,
+        L2_LINES_IN_S_C,
+        L2_LINES_IN_E_C,
+        L2_LINES_IN_ALL_C,
+        L2_LINES_OUT_DEMAND_CLEAN_C,
+        L2_LINES_OUT_DEMAND_DIRTY_C,
+        L2_LINES_OUT_DEMAND_PF_CLEAN_C,
+        L2_LINES_OUT_DEMAND_PF_DIRTY_C, // last execution end
+        L2_LINES_OUT_DEMAND_DIRTY_ALL_C, //#216 should not be used as parameter at _channel_3 -> use 214
+        SQ_MISC_SPLIT_LOCK_C, //217
+        EVENTS
+    };
+
+    enum Flags {
+        NONE,
+        INT
+    };
+    //first test 12. last normal test 212. last test 214 
+    static const unsigned int _channel_3 = 14; // sum 4 after each execution
+    //static const unsigned int _channel_3 = 214; // sum 4 after each execution
+    // static const unsigned int _channel_4 = _channel_3+1;
+    // static const unsigned int _channel_5 = _channel_4+1;
+    // static const unsigned int _channel_6 = _channel_5+1;
+
+    static const unsigned int _channel_4 = 77;
+    static const unsigned int _channel_5 = 138;
+    static const unsigned int _channel_6 = 139;
+
+protected:
+    PMU_Common() {}
+};
+
+__END_SYS
+
+#ifdef __PMU_H
+#include __PMU_H
+#endif
+
+#endif
